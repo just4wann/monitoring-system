@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@font-face {
+    font-family: Poppins-Regular;
+    src: url('fonts/poppins-font/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: Panasonic-Bold;
+    src: url('fonts/panasonic-font/DINOT-Bold.otf');
+}
+
+@font-face {
+    font-family: Panasonic-Medium;
+    src: url('fonts/panasonic-font/DINOT-Medium.otf');
+}
+
+@font-face {
+    font-family: Panasonic-Light;
+    src: url('fonts/panasonic-font/DINOT-Medium.otf');
+}
+
+body {
+    font-family: Panasonic-Medium, sans-serif;
+}
+
+.pnsc-bold {
+    font-family: Panasonic-Bold, sans-serif;
+}
+
+.pnsc-light {
+    font-family: Panasonic-Light, sans-serif;
+}
