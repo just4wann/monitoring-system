@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui';
-import { VisXYContainer, VisLine, VisAxis, VisCrosshair, VisTooltip, VisScatter, VisBulletLegend } from '@unovis/vue';
+import { VisXYContainer, VisLine, VisAxis, VisCrosshair, VisTooltip, VisScatter, VisBulletLegend, VisArea } from '@unovis/vue';
 import { ref, onMounted, shallowRef } from 'vue';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 
@@ -9,12 +9,12 @@ type Data = { id: number; timestamp: string; temperature: number };
 const showGraph = ref<boolean>(false);
 const selectItems = ref<string[]>(['Mangan', 'Bobin', 'Bubuk']);
 const selectedItems = ref<string>('');
-const selectNo = ref<string[]>(['Block 1', 'Block, 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6']);
+const selectNo = ref<string[]>(['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6']);
 const selectedNo = ref<string>('');
 const pageIndication = ref<string | undefined>('');
 const time = ref<string>();
 const date = ref<string>();
-const count = 20;
+const count = 19;
 
 const df = new DateFormatter('en-US', {
   dateStyle: 'medium',
@@ -44,7 +44,7 @@ const item = ref<TabsItem[]>([
 
 const toolTipFormat = (d: Data) => `<p class="text-xs">${d.temperature} C</p>`;
 
-function checkSlot(item?: string) {
+const checkSlot = (item?: string) => {
   pageIndication.value = item;
 }
 
@@ -70,7 +70,7 @@ function generateTemperatureData(count: number): Data[] {
 
   for (let i = 0; i < count; i++) {
     const timestamp = new Date(startTime.getTime() + i * 1 * 60 * 1000);
-    const temperature = 25 + Math.random() * 10;
+    const temperature = 25 + Math.random() * 50;
 
     data.push({
       id: i + 1,
@@ -78,11 +78,10 @@ function generateTemperatureData(count: number): Data[] {
       temperature: parseFloat(temperature.toFixed(1)),
     });
   }
-
   return data;
 }
 
-const data = generateTemperatureData(500);
+const data = generateTemperatureData(200);
 
 function xTickFormat(i: number): string {
   const d = getShortData(data);
@@ -171,13 +170,14 @@ onMounted(() => {
             <USelect :items="selectNo" v-model="selectedNo" placeholder="Select Block No" variant="outline" class="pnsc-light w-40" />
           </div>
         </div>
-        <div class="flex gap-1.5 flex-wrap justify-start">
-          <UCard v-for="i in count" class="flex flex-col gap-5" :class="count < 3 ? 'w-full' : 'w-95'">
-            <h1 class="text-xs pnsc-light mb-2">Oven {{ i }} {{ selectedItems }}</h1>
+        <div class="flex gap-1.5 flex-wrap justify-center">
+          <UCard v-for="i in count" class="flex flex-col gap-5" :class="count <= 3 ? 'w-full' : 'w-95'">
+            <h1 class="text-sm pnsc-light mb-2">Oven {{ i }} {{ selectedItems }}</h1>
             <VisXYContainer :data="getShortData(data)" :height="180">
               <VisLine :x="x" :y="y" :lineWidth="2" />
               <VisAxis type="x" :x="x" :gridLine="false" label="Time" labelFontSize="11px" tickTextFontSize="12px" :tickFormat="xTickFormat" :numTicks="5" :tickTextAngle="15"/>
               <VisAxis type="y" :y="x" label="Temp(C)" labelFontSize="11px" tickTextFontSize="12px" />
+              <VisArea :x="x" :y="y" color="#006eff3a"/>
               <VisCrosshair :template="toolTipFormat" />
               <VisTooltip />
             </VisXYContainer>
