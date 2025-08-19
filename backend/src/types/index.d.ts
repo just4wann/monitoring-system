@@ -1,0 +1,13 @@
+export enum EnumOvenType {
+    MANGAN = "mangan",
+    BOBIN = "bobin",
+    BUBUK = "bubuk"
+}
+
+export type OvenType = "mangan" | "bobin" | "bubuk";
+
+export interface ResponseBody<T> {
+    statusCode: number,
+    message: string,
+    data?: T
+}
