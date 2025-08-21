@@ -2,7 +2,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 import Oven from '@/model/oven.model.js';
 import OvenTemperature from '@/model/oven_temperatures.model.js';
 
-const sequelize: Sequelize = new Sequelize('');
+const sequelize: Sequelize = new Sequelize('postgres://postgres:postgres@localhost:5432/monitoring_system');
 
 export default class SequelizeDB {
   constructor() {}

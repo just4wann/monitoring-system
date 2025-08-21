@@ -9,55 +9,57 @@ export default class OvenService {
   constructor() {}
 
   static async add(ovenType: OvenType, ovenNo: number): Promise<ResponseBody<Oven> | undefined> {
+    if (!ovenType || !ovenNo) throw new ResponseError(400, 'required data is missing');
+
     if (!Object.values(EnumOvenType).includes(ovenType as EnumOvenType)) {
       console.error('oven type does not exist');
-      throw new ResponseError(400, 'Oven type invalid')
+      throw new ResponseError(400, 'Oven type invalid');
     }
 
     const isOvenNoExist = await Oven.findOne({
       where: {
-        [Op.and]: [ { ovenNo }, { ovenType } ],
+        [Op.and]: [{ ovenNo }, { ovenType }],
       },
     });
 
     if (isOvenNoExist) {
-        console.error('no oven exist');
-        throw new ResponseError(404, 'oven no not found')
+      console.error('no oven exist');
+      throw new ResponseError(404, 'oven no not found');
     }
 
     const oven: Oven = await Oven.create({
-        ovenType: ovenType,
-        ovenNo: ovenNo
-    })
+      ovenType: ovenType,
+      ovenNo: ovenNo,
+    });
 
     return {
-        statusCode: 200,
-        message: 'OK',
-        data: oven
-    }
-
+      statusCode: 200,
+      message: 'OK',
+      data: oven,
+    };
   }
 
   static async get(ovenType: OvenType, ovenNo: number): Promise<ResponseBody<Oven | null>> {
+    if (!ovenType || !ovenNo) throw new ResponseError(400, 'required data is missing');
+
     if (!Object.values(EnumOvenType).includes(ovenType as EnumOvenType)) {
       console.error('oven type does not exist');
-      throw new ResponseError(400, 'Oven type invalid')
+      throw new ResponseError(400, 'Oven type invalid');
     }
 
     const ovenData: Oven | null = await Oven.findOne({
       where: {
-        [Op.and]: [
-          { ovenType },
-          { ovenNo }
-        ]
+        [Op.and]: [{ ovenType }, { ovenNo }],
       },
+      attributes: ['id', 'ovenType', 'ovenNo'],
       include: [
         {
           attributes: ['temperature', 'createdAt'],
-          model: OvenTemperature
-        }
+          model: OvenTemperature,
+          as: 'temperatures',
+          order: ['createdAt'],
+        },
       ],
-      order: ["createdAt"]
     });
 
     if (!ovenData) throw new ResponseError(404, 'oven not found');
@@ -65,33 +67,38 @@ export default class OvenService {
     return {
       statusCode: 200,
       message: 'OK',
-      data: ovenData
-    }
+      data: ovenData,
+    };
   }
 
   static async getAll(ovenType: OvenType): Promise<ResponseBody<Oven[]>> {
+    if (!ovenType) throw new ResponseError(400, 'required data is missing');
+
     if (!Object.values(EnumOvenType).includes(ovenType as EnumOvenType)) {
       console.error('oven type does not exist');
-      throw new ResponseError(400, 'Oven type invalid')
+      throw new ResponseError(400, 'Oven type invalid');
     }
 
     const ovenData: Oven[] = await Oven.findAll({
       where: {
-        ovenType
+        ovenType,
       },
+      attributes: ['id', 'ovenType', 'ovenNo'],
       include: [
         {
           attributes: ['temperature', 'createdAt'],
-          model: OvenTemperature
-        }
+          model: OvenTemperature,
+          as: 'temperatures',
+          order: ['createdAt'],
+        },
       ],
-      order: ["createdAt"]
+      order: ['ovenNo']
     });
 
     return {
       statusCode: 200,
       message: 'OK',
-      data: ovenData
-    }
+      data: ovenData,
+    };
   }
 }

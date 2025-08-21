@@ -1,18 +1,25 @@
 import express from 'express';
 import SequelizeDB from './db/index.js';
+import Router from './routes/index.js';
 
-import type { Response, Request } from 'express';
+import errorMiddleware from './middleware/error.middleware.js';
 
 const app = express();
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
 const sequelize = new SequelizeDB();
+const router = new Router(app);
 
-app.get('/hello', (req: Request, res: Response) => {
-    res.send('hai');    
-})
+router.setupRouter();
+app.use(errorMiddleware);
 
-app.listen(8000, () => {
-    console.log('server start')
-})
-
+app.listen(8001, 'localhost', () => {
+  console.log('server start');
+});
 sequelize.connectDB();
 sequelize.syncDB();

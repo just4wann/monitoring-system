@@ -11,3 +11,8 @@ export interface ResponseBody<T> {
     message: string,
     data?: T
 }
+
+export interface ExtendedRequestBody {
+    ovenType: OvenType;
+    ovenNo?: number;
+}
