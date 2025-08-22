@@ -49,16 +49,20 @@ export class MewtocolClient extends EventEmitter {
   }
 
   private parseIntArray(data: string): number[] {
-    let arr: number[] = [];
-    for (let i = 0; i < data.length; i = i + 4) {
-      const hexstr: string = data[i + 2] + data[i + 3] + data[i] + data[i + 1];
-      let val: number = parseInt(hexstr, 16);
-      if ((val & 0x8000) > 0) {
-        val = val - 0x10000;
+    const responseDataOnly = data.slice(6, data.length);
+    let hexArrData: number[] = [];
+    let resultData: number[] = [];
+    for (let i = 0; i < responseDataOnly.length / 4; i++) {
+      let hexStr: string = '';
+      for (let j = i * 4; j < (i + 1) * 4; j++) {
+        hexStr += responseDataOnly[j];
       }
-      arr.push(val);
+      hexArrData.push(parseInt(hexStr, 16));
     }
-    return arr;
+    for (let i = 0; i < hexArrData.length; i++) {
+      resultData.push((hexArrData[i] >> 8) | ((hexArrData[i] & 0x0001) << 8));
+    }
+    return resultData;
   }
 
   private sendCommand(cmd: string) {
@@ -81,10 +85,9 @@ export class MewtocolClient extends EventEmitter {
     client.socket.on('data', function (buff) {
       let stringbuff: string = buff.toString();
       dataBuff = stringbuff.slice(0, buff.length - 3);
+      client.dataReceived = client.parseIntArray(dataBuff);
       clearTimeout(timeout);
     });
-
-    this.dataReceived = this.parseIntArray(dataBuff);
 
     client.socket.on('error', (err) => {
       client.emit('error', { error: 'TCP socket error', msg: err });

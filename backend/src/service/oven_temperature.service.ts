@@ -5,6 +5,7 @@ export default class OvenTemperatureService {
     constructor(private readonly mewtocol: MewtocolClient) {}
 
     static async add(ovenId: number, value: number): Promise<void> {
+        
         await OvenTemperature.create({
             ovenId: ovenId,
             temperature: value
