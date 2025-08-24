@@ -8,7 +8,7 @@ import OvenTemperature from '@/model/oven_temperatures.model.js';
 export default class OvenService {
   constructor() {}
 
-  static async add(ovenType: OvenType, ovenNo: number): Promise<ResponseBody<Oven> | undefined> {
+  static async add(ovenType: OvenType, ovenNo: number): Promise<ResponseBody<Oven>> {
     if (!ovenType || !ovenNo) throw new ResponseError(400, 'required data is missing');
 
     if (!Object.values(EnumOvenType).includes(ovenType as EnumOvenType)) {
@@ -39,7 +39,7 @@ export default class OvenService {
     };
   }
 
-  static async get(ovenType: OvenType, ovenNo: number): Promise<ResponseBody<Oven | null>> {
+  static async get(ovenType?: OvenType, ovenNo?: number): Promise<ResponseBody<Oven | null>> {
     if (!ovenType || !ovenNo) throw new ResponseError(400, 'required data is missing');
 
     if (!Object.values(EnumOvenType).includes(ovenType as EnumOvenType)) {
@@ -71,7 +71,7 @@ export default class OvenService {
     };
   }
 
-  static async getAll(ovenType: OvenType): Promise<ResponseBody<Oven[]>> {
+  static async getAll(ovenType?: OvenType): Promise<ResponseBody<Oven[]>> {
     if (!ovenType) throw new ResponseError(400, 'required data is missing');
 
     if (!Object.values(EnumOvenType).includes(ovenType as EnumOvenType)) {
@@ -89,7 +89,6 @@ export default class OvenService {
           attributes: ['temperature', 'createdAt'],
           model: OvenTemperature,
           as: 'temperatures',
-          order: ['createdAt'],
         },
       ],
       order: ['ovenNo']

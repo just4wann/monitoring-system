@@ -6,8 +6,9 @@ export default class Router {
 
     public setupRouter() {
         this.app.get('/', (req, res) => {
-            res.send('hai')
+            res.send('server running')
         })
+        this.app.post('/add', OvenController.add)
         this.app.get('/get', OvenController.get);
         this.app.get('/get_all', OvenController.getAll);
     }

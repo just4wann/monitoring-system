@@ -1,20 +1,56 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui';
-import { VisXYContainer, VisLine, VisAxis, VisCrosshair, VisTooltip, VisScatter, VisBulletLegend, VisArea } from '@unovis/vue';
-import { ref, onMounted, shallowRef } from 'vue';
+import { VisXYContainer, VisLine, VisAxis, VisCrosshair, VisTooltip, VisArea } from '@unovis/vue';
+import { ref, onMounted, shallowRef, watchEffect } from 'vue';
 import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
+import { OvenAPI } from '../composables';
+import type { OvenResponseType, OvenType, SelectOvenType, TemperatureListType } from '../types';
 
-type Data = { id: number; timestamp: string; temperature: number };
+import { generateTime, generateTimestamp } from '../utils';
 
+const temporary = ref<TemperatureListType[]>([
+  {
+    temperature: '10',
+    createdAt: '2025-08-24T15:04:52.451Z'
+  },
+  {
+    temperature: '10',
+    createdAt: '2025-08-24T15:04:52.451Z'
+  },
+  {
+    temperature: '10',
+    createdAt: '2025-08-24T15:04:52.451Z'
+  },
+  {
+    temperature: '10',
+    createdAt: '2025-08-24T15:04:52.451Z'
+  },
+])
+
+const data = ref<TemperatureListType>();
 const showGraph = ref<boolean>(false);
-const selectItems = ref<string[]>(['Mangan', 'Bobin', 'Bubuk']);
-const selectedItems = ref<string>('');
+const selectItems = ref<SelectOvenType[]>([
+  {
+    label: 'Mangan',
+    value: 'mangan',
+  },
+  {
+    label: 'Bubuk',
+    value: 'bubuk',
+  },
+  {
+    label: 'Bobin',
+    value: 'bobin',
+  },
+]);
+const selectedItems = ref<OvenType>('mangan');
 const selectNo = ref<string[]>(['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6']);
 const selectedNo = ref<string>('');
 const pageIndication = ref<string | undefined>('');
 const time = ref<string>();
 const date = ref<string>();
-const count = 19;
+
+const ovenListData = ref<OvenResponseType[] | []>([]);
 
 const df = new DateFormatter('en-US', {
   dateStyle: 'medium',
@@ -24,8 +60,8 @@ const dateModel = shallowRef({
   end: new CalendarDate(2023, 1, 30),
 });
 
-const x = (_d: Data, i: number): number => i;
-const y = [(d: Data): number => d.temperature];
+const x = (_d: TemperatureListType, i: number): number => i;
+const y = [(d: TemperatureListType): number => parseInt(d.temperature)];
 
 const item = ref<TabsItem[]>([
   {
@@ -42,78 +78,32 @@ const item = ref<TabsItem[]>([
   },
 ]);
 
-const toolTipFormat = (d: Data) => `<p class="text-xs">${d.temperature} C</p>`;
+const toolTipFormat = (d: TemperatureListType) => `<p class="text-xs">${d.temperature} C</p>`;
 
 const checkSlot = (item?: string) => {
   pageIndication.value = item;
-}
-
-function generateTimestamp(at: string | Date): string[] {
-  const date = new Date(at);
-  const formatDate = date.toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: 'long',
-  });
-
-  const time = date.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-
-  return [`${time}`, `${formatDate}`];
-}
-
-function generateTemperatureData(count: number): Data[] {
-  const data = [];
-  const startTime = new Date('2025-08-18T08:00:00Z');
-
-  for (let i = 0; i < count; i++) {
-    const timestamp = new Date(startTime.getTime() + i * 1 * 60 * 1000);
-    const temperature = 25 + Math.random() * 50;
-
-    data.push({
-      id: i + 1,
-      timestamp: timestamp.toISOString(),
-      temperature: parseFloat(temperature.toFixed(1)),
-    });
-  }
-  return data;
-}
-
-const data = generateTemperatureData(200);
+};
 
 function xTickFormat(i: number): string {
-  const d = getShortData(data);
-  return generateTimestamp(d[i].timestamp)[0];
+  const d = getShortData(ovenListData.value[i].temperatures);
+  return generateTimestamp(d[i]?.createdAt)[0];
 }
 
 function xTickFormatL(i: number): string {
-  return generateTimestamp(data[i].timestamp)[0];
+  return generateTimestamp(ovenListData.value[i].temperatures[i].createdAt)[0];
 }
 
-function generateTime(): { timestamp: string[]; current: number[] } {
-  const now = new Date();
-  return {
-    timestamp: [
-      now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'Asia/Jakarta',
-      }),
-      now.toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'Asia/Jakarta',
-      }),
-    ],
-    current: [now.getFullYear(), now.getMonth() + 1, now.getDate()],
-  };
-}
+function getShortData(data: TemperatureListType[]): TemperatureListType[] {
+  if (data.length === 0)
+    return [
+      {
+        temperature: '0',
+        createdAt: '',
+      },
+    ];
 
-function getShortData(data: Data[]): Data[] {
+  if (data.length <= 10) return data;
+
   let shortedData = [];
   for (let i = data.length - 1; i > data.length - 10; i--) {
     shortedData.unshift(data[i]);
@@ -127,7 +117,11 @@ setInterval(() => {
   date.value = timestamp[1];
 }, 60000);
 
-onMounted(() => {
+watchEffect(async () => {
+  ovenListData.value = await OvenAPI.getOvenByType(selectedItems.value);
+});
+
+onMounted(async () => {
   const { timestamp, current } = generateTime();
   time.value = timestamp[0];
   date.value = timestamp[1];
@@ -164,20 +158,20 @@ onMounted(() => {
       </template>
       <section v-if="pageIndication == 'Dashboard'" class="flex flex-col gap-5">
         <div class="flex items-center w-full justify-between">
-          <h1 class="text-center pnsc-bold">OVEN {{ selectedItems.toUpperCase() || 'MANGAN' }}</h1>
+          <h1 class="text-center pnsc-bold">OVEN {{ selectedItems.toUpperCase() }}</h1>
           <div class="flex gap-2">
             <USelect :items="selectItems" v-model="selectedItems" placeholder="Select Oven" variant="outline" class="pnsc-light w-40" />
             <USelect :items="selectNo" v-model="selectedNo" placeholder="Select Block No" variant="outline" class="pnsc-light w-40" />
           </div>
         </div>
         <div class="flex gap-1.5 flex-wrap justify-center">
-          <UCard v-for="i in count" class="flex flex-col gap-5" :class="count <= 3 ? 'w-full' : 'w-95'">
-            <h1 class="text-sm pnsc-light mb-2">Oven {{ i }} {{ selectedItems }}</h1>
-            <VisXYContainer :data="getShortData(data)" :height="180">
+          <UCard v-for="oven in ovenListData" class="flex flex-col gap-5" :class="ovenListData.length <= 3 ? 'w-full' : 'w-95'">
+            <h1 class="text-sm pnsc-light mb-2">Oven {{ oven.ovenNo }} {{ selectedItems }}</h1>
+            <VisXYContainer :data="getShortData(oven.temperatures)" :height="180">
               <VisLine :x="x" :y="y" :lineWidth="2" />
-              <VisAxis type="x" :x="x" :gridLine="false" label="Time" labelFontSize="11px" tickTextFontSize="12px" :tickFormat="xTickFormat" :numTicks="5" :tickTextAngle="15"/>
+              <VisAxis type="x" :x="x" :gridLine="false" label="Time" labelFontSize="11px" tickTextFontSize="12px" :tickFormat="xTickFormat"  :tickTextAngle="15" />
               <VisAxis type="y" :y="x" label="Temp(C)" labelFontSize="11px" tickTextFontSize="12px" />
-              <VisArea :x="x" :y="y" color="#006eff3a"/>
+              <VisArea :x="x" :y="y" color="#006eff3a" />
               <VisCrosshair :template="toolTipFormat" />
               <VisTooltip />
             </VisXYContainer>

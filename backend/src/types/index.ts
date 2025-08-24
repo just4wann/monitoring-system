@@ -16,3 +16,8 @@ export interface ExtendedRequestBody {
     ovenType: OvenType;
     ovenNo?: number;
 }
+
+export interface SearchQuery {
+    ovenType?: OvenType;
+    ovenNo?: number; 
+}

@@ -67,6 +67,11 @@ export default class SequelizeDB {
       foreignKey: 'ovenId',
       as: 'temperatures',
     });
+
+    OvenTemperature.belongsTo(Oven, {
+      foreignKey: 'ovenId',
+      as: 'oven'
+    })
   }
 
   public async connectDB() {

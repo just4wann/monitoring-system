@@ -4,6 +4,7 @@ import { ValidationError } from "sequelize";
 
 export default function errorMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
     if (err instanceof ValidationError) {
+        console.log(err)
         res.status(400).json({
             statusCode: 400,
             message: err.message
