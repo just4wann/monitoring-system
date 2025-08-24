@@ -8,25 +8,6 @@ import type { OvenResponseType, OvenType, SelectOvenType, TemperatureListType } 
 
 import { generateTime, generateTimestamp } from '../utils';
 
-const temporary = ref<TemperatureListType[]>([
-  {
-    temperature: '10',
-    createdAt: '2025-08-24T15:04:52.451Z'
-  },
-  {
-    temperature: '10',
-    createdAt: '2025-08-24T15:04:52.451Z'
-  },
-  {
-    temperature: '10',
-    createdAt: '2025-08-24T15:04:52.451Z'
-  },
-  {
-    temperature: '10',
-    createdAt: '2025-08-24T15:04:52.451Z'
-  },
-])
-
 const data = ref<TemperatureListType>();
 const showGraph = ref<boolean>(false);
 const selectItems = ref<SelectOvenType[]>([
