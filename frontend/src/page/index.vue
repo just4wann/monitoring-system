@@ -1,217 +1,67 @@
 <script setup lang="ts">
-import type { TabsItem } from '@nuxt/ui';
-import { VisXYContainer, VisLine, VisAxis, VisCrosshair, VisTooltip, VisArea } from '@unovis/vue';
-import { ref, onMounted, shallowRef, watchEffect } from 'vue';
-import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
+import { ref, onMounted } from 'vue';
 import { OvenAPI } from '../composables';
-import type { OvenResponseType, OvenType, SelectOvenType, TemperatureListType } from '../types';
+import { store } from '../store';
 
-import { generateTime, generateTimestamp } from '../utils';
+const toast = useToast();
+const target = ref<number>(430);
 
-const data = ref<TemperatureListType>();
-const showGraph = ref<boolean>(false);
-const selectItems = ref<SelectOvenType[]>([
-  {
-    label: 'Mangan',
-    value: 'mangan',
-  },
-  {
-    label: 'Bubuk',
-    value: 'bubuk',
-  },
-  {
-    label: 'Bobin',
-    value: 'bobin',
-  },
-]);
-const selectedItems = ref<OvenType>('mangan');
-const selectNo = ref<string[]>(['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6']);
-const selectedNo = ref<string>('');
 const pageIndication = ref<string | undefined>('');
-const time = ref<string>();
-const date = ref<string>();
 
-const ovenListData = ref<OvenResponseType[] | []>([]);
+setInterval(async () => {
+  // const { message: _manganMessage, data: manganData } = await OvenAPI.getOvenByType('mangan');
+  // const { message: _bobinMessage, data: bobinData } = await OvenAPI.getOvenByType('bobin');
+  // const { message: _bubukMessage, data: bubukData } = await OvenAPI.getOvenByType('bubuk');
 
-const df = new DateFormatter('en-US', {
-  dateStyle: 'medium',
-});
-const dateModel = shallowRef({
-  start: new CalendarDate(2023, 1, 20),
-  end: new CalendarDate(2023, 1, 30),
-});
-
-const x = (_d: TemperatureListType, i: number): number => i;
-const y = [(d: TemperatureListType): number => parseInt(d.temperature)];
-
-const item = ref<TabsItem[]>([
-  {
-    label: 'Dashboard',
-    icon: 'i-lucide-layout-dashboard',
-  },
-  {
-    label: 'Record',
-    icon: 'i-lucide-notebook-tabs',
-  },
-  {
-    label: 'History',
-    icon: 'i-lucide-history',
-  },
-]);
-
-const toolTipFormat = (d: TemperatureListType) => `<p class="text-xs">${d.temperature} C</p>`;
-
-const checkSlot = (item?: string) => {
-  pageIndication.value = item;
-};
-
-function xTickFormat(i: number): string {
-  const d = getShortData(ovenListData.value[i].temperatures);
-  return generateTimestamp(d[i]?.createdAt)[0];
-}
-
-function xTickFormatL(i: number): string {
-  return generateTimestamp(ovenListData.value[i].temperatures[i].createdAt)[0];
-}
-
-function getShortData(data: TemperatureListType[]): TemperatureListType[] {
-  if (data.length === 0)
-    return [
-      {
-        temperature: '0',
-        createdAt: '',
-      },
-    ];
-
-  if (data.length <= 10) return data;
-
-  let shortedData = [];
-  for (let i = data.length - 1; i > data.length - 10; i--) {
-    shortedData.unshift(data[i]);
-  }
-  return shortedData;
-}
-
-setInterval(() => {
-  const { timestamp } = generateTime();
-  time.value = timestamp[0];
-  date.value = timestamp[1];
+  // if (manganData.length === 0 || bobinData.length === 0 || bubukData.length === 0) {
+  //   toast.add({
+  //     title: 'Error',
+  //     description: 'Internal Server Error',
+  //     color: 'error',
+  //   })
+  //   return;
+  // }
+  // store.temperatureOvenMangan = manganData;
+  // store.temperatureOvenBubuk = bubukData;
+  // store.temperatureOvenBobin = bobinData;
 }, 60000);
 
-watchEffect(async () => {
-  ovenListData.value = await OvenAPI.getOvenByType(selectedItems.value);
-});
-
 onMounted(async () => {
-  const { timestamp, current } = generateTime();
-  time.value = timestamp[0];
-  date.value = timestamp[1];
+  // const { message: _manganMessage, data: manganData } = await OvenAPI.getOvenByType('mangan');
+  // const { message: _bobinMessage, data: bobinData } = await OvenAPI.getOvenByType('bobin');
+  // const { message: _bubukMessage, data: bubukData } = await OvenAPI.getOvenByType('bubuk');
 
-  dateModel.value.start = new CalendarDate(current[0], current[1], current[2]);
-  dateModel.value.end = new CalendarDate(current[0], current[1], current[2]);
+  // if (manganData.length === 0 || bobinData.length === 0 || bubukData.length === 0) {
+  //   toast.add({
+  //     title: 'Error',
+  //     description: 'Internal Server Error',
+  //     color: 'error',
+  //   })
+  //   return;
+  // }
+
+  // store.temperatureOvenMangan = manganData;
+  // store.temperatureOvenBubuk = bubukData;
+  // store.temperatureOvenBobin = bobinData;
 });
+
+function handleUpdatePageIndicationProps(value?: string) {
+  pageIndication.value = value
+}
+function handleGetTemperatureTargetProps(value: number) {
+  target.value = value;
+}
 </script>
 <template>
   <main class="relative flex h-screen">
-    <section class="flex flex-col justify-between bg-white text-slate-700 pl-10 py-10 pnsc-light overflow-auto">
-      <div class="flex flex-col justify-start gap-10 w-fit">
-        <img src="../assets/logo/Panasonic_logo_blue.png" alt="" width="120" class="mr-auto" />
-        <UTabs :items="item" orientation="vertical" class="w-full" variant="link" size="lg">
-          <template #content="{ item }">
-            <p>{{ checkSlot(item.label) }}</p>
-          </template>
-        </UTabs>
-      </div>
-      <div class="flex flex-col items-start gap-1">
-        <p class="pnsc-light text-xs text-slate-500">Developed by</p>
-        <h1 class="pnsc-bold leading-4 text-blue-800">PRODUCTION ENGINEERING</h1>
-      </div>
-    </section>
-    <UCard class="w-full overflow-y-auto" variant="soft">
+    <Sidebar @update="handleUpdatePageIndicationProps"/>
+    <UCard class="w-full overflow-y-auto" variant="subtle">
       <template #header>
-        <section class="flex justify-center relative">
-          <h1 class="text-2xl pnsc-bold text-blue-800 tracking-wider">FACTORY 1 OVEN MONITORING SYSTEM</h1>
-          <div class="pnsc-light text-xs absolute right-0">
-            <p>{{ time }}</p>
-            <p>{{ date }}</p>
-          </div>
-        </section>
+        <Header/>
       </template>
-      <section v-if="pageIndication == 'Dashboard'" class="flex flex-col gap-5">
-        <div class="flex items-center w-full justify-between">
-          <h1 class="text-center pnsc-bold">OVEN {{ selectedItems.toUpperCase() }}</h1>
-          <div class="flex gap-2">
-            <USelect :items="selectItems" v-model="selectedItems" placeholder="Select Oven" variant="outline" class="pnsc-light w-40" />
-            <USelect :items="selectNo" v-model="selectedNo" placeholder="Select Block No" variant="outline" class="pnsc-light w-40" />
-          </div>
-        </div>
-        <div class="flex gap-1.5 flex-wrap justify-center">
-          <UCard v-for="oven in ovenListData" class="flex flex-col gap-5" :class="ovenListData.length <= 3 ? 'w-full' : 'w-95'">
-            <h1 class="text-sm pnsc-light mb-2">Oven {{ oven.ovenNo }} {{ selectedItems }}</h1>
-            <VisXYContainer :data="getShortData(oven.temperatures)" :height="180">
-              <VisLine :x="x" :y="y" :lineWidth="2" />
-              <VisAxis type="x" :x="x" :gridLine="false" label="Time" labelFontSize="11px" tickTextFontSize="12px" :tickFormat="xTickFormat"  :tickTextAngle="15" />
-              <VisAxis type="y" :y="x" label="Temp(C)" labelFontSize="11px" tickTextFontSize="12px" />
-              <VisArea :x="x" :y="y" color="#006eff3a" />
-              <VisCrosshair :template="toolTipFormat" />
-              <VisTooltip />
-            </VisXYContainer>
-          </UCard>
-        </div>
-      </section>
-      <section v-if="pageIndication === 'Record'" class="flex items-start gap-2">
-        <section class="flex-1">
-          <h1 class="pnsc-bold items-center">Data Record</h1>
-          <section class="flex flex-col gap-4 w-fit">
-            <div class="flex flex-2 mt-5 gap-5">
-              <div class="flex flex-col gap-5 pnsc-light text-sm">
-                <p>Select periode time :</p>
-                <p>Select Oven Type :</p>
-                <p>Oven No :</p>
-              </div>
-              <div class="flex-1 flex flex-col items-start justify-center gap-3">
-                <UPopover>
-                  <section class="flex items-center gap-3 text-sm">
-                    <UButton color="neutral" variant="subtle" icon="i-lucide-calendar" size="sm" class="w-full">
-                      <template v-if="dateModel.start">
-                        <template v-if="dateModel.end"> {{ df.format(dateModel.start.toDate(getLocalTimeZone())) }} - {{ df.format(dateModel.end.toDate(getLocalTimeZone())) }} </template>
-                        <template v-else>
-                          {{ df.format(dateModel.start.toDate(getLocalTimeZone())) }}
-                        </template>
-                      </template>
-                      <template v-else> Pick a periode time </template>
-                    </UButton>
-                  </section>
-                  <template #content>
-                    <UCalendar v-model="dateModel" class="p-2" :number-of-months="1" range color="neutral" />
-                  </template>
-                </UPopover>
-                <USelect :items="selectItems" v-model="selectedItems" placeholder="Select Oven Type" variant="outline" class="pnsc-light w-full" size="sm" />
-                <UInput placeholder="Input Oven CH.." size="sm" class="w-full" />
-              </div>
-            </div>
-            <UButton label="Show Graph" class="self-end" size="sm" color="neutral" @click="showGraph = !showGraph" />
-          </section>
-        </section>
-        <section class="flex-2 h-[calc(100vh-120px)] flex flex-col gap-5">
-          <UCard class="h-full flex justify-center items-center">
-            <UCard class="flex flex-col gap-5 w-[45rem]" variant="soft" v-if="showGraph">
-              <VisXYContainer :data="data" :height="500">
-                <VisLine :x="x" :y="y" :lineWidth="2" />
-                <VisAxis type="x" :x="x" label="Time" labelFontSize="11px" tickTextFontSize="12px" :numTicks="10" :tickFormat="xTickFormatL" :tickTextAngle="30" />
-                <VisAxis type="y" :y="x" label="Temp(C)" labelFontSize="11px" tickTextFontSize="12px" />
-                <VisCrosshair :template="toolTipFormat" />
-                <VisTooltip />
-              </VisXYContainer>
-            </UCard>
-            <h1 v-else class="text-slate-400 text-lg">Result will appear here</h1>
-          </UCard>
-          <UButton label="Download PDF" class="self-end" size="sm" color="primary" v-if="showGraph" />
-        </section>
-      </section>
-      <section v-if="pageIndication === 'History'">
-        <h1>History Page</h1>
-      </section>
+      <Dashboard v-if="pageIndication == 'Dashboard'" @getTemperatureTarget="handleGetTemperatureTargetProps"/>
+      <Record v-if="pageIndication == 'Record'" :maxTemperatureTarget="target"/>
+      <History v-if="pageIndication === 'History'"/>
     </UCard>
   </main>
 </template>
