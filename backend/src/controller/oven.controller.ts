@@ -15,20 +15,20 @@ export default class OvenController {
         }
     }
 
-    static async get(req: Request<{}, {}, {}, SearchQuery>, res: Response, next: NextFunction): Promise<void> {
+    static async getTemperatureReport(req: Request<{}, {}, {}, SearchQuery>, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { ovenType, ovenNo } = req.query as SearchQuery;
-            const result = await OvenService.get(ovenType, ovenNo);
-            res.status(result.statusCode).json(result.data);
+            const { ovenType, ovenNo, startDay, endDay, startHour, endHour } = req.query as SearchQuery;
+            const result = await OvenService.getTemperatureReport(ovenType, ovenNo, startDay, endDay, startHour, endHour);
+            res.status(result.statusCode).json(result);
         } catch (error) {
             next(error)
         }
     }
 
-    static async getAll(req: Request<{}, {}, {}, SearchQuery>, res: Response, next: NextFunction): Promise<void> {
+    static async getTemperatureMonitoring(req: Request<{}, {}, {}, SearchQuery>, res: Response, next: NextFunction): Promise<void> {
         try {
             const { ovenType } = req.query as SearchQuery;
-            const result = await OvenService.getAll(ovenType);
+            const result = await OvenService.getTemperatureMonitoring(ovenType);
             res.status(result.statusCode).json(result);
         } catch (error) {
             next(error)

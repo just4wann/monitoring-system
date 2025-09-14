@@ -2,6 +2,7 @@ import net from 'net';
 import EventEmitter from 'events';
 
 import type { Socket } from 'net';
+import { IConnectionError } from '@/types/index.js';
 
 const defaultport = 9094;
 const localhost = '127.0.0.1';
@@ -13,6 +14,7 @@ export default class MewtocolClient extends EventEmitter {
   private timeout: number;
   private socket: Socket;
   private dataReceived: number[];
+  private error?: Error | IConnectionError | string;
 
   constructor(host?: string, port?: number, timeout?: number) {
     super();
@@ -23,11 +25,13 @@ export default class MewtocolClient extends EventEmitter {
     this.socket.setTimeout(this.timeout);
 
     this.socket.on('close', (hadError) => {
+      console.log('connection closed')
       this.emit('disconnect', hadError);
       return;
     });
 
     this.socket.on('timeout', () => {
+      console.log('connection timeout')
       this.emit('timeout', { error: 'Socket idle timeout' });
       this.destroy();
     });
@@ -36,7 +40,6 @@ export default class MewtocolClient extends EventEmitter {
       this.emit('connect', { host: this.host, port: this.port });
     });
 
-    this.connect();
     this.dataReceived = [];
   }
 
@@ -67,33 +70,37 @@ export default class MewtocolClient extends EventEmitter {
 
   private async sendCommand(cmd: string): Promise<void> {
     const client = this;
-    if (client.socket.destroyed) client.connect();
+    if (client.socket.destroyed || client.socket.closed) {
+      console.log('reconnetc')
+      client.connect();
+    }
+
     let timeout: NodeJS.Timeout;
-    let dataBuff: string = '';
-    const cmdchar: string = cmd.slice(0, 1);
-    const station: string = cmd.slice(1, 3);
 
     if (!cmd.endsWith('\r')) cmd += '\r';
 
     return new Promise((resolve, reject) => {
       client.socket.write(cmd, () => {
         timeout = setTimeout(function () {
-          client.emit('timeout', { error: 'Timeout waiting for the data from PLC' });
-          reject();
+          reject('Timeout read data from PLC');
         }, client.timeout);
       });
   
-      client.socket.on('data', function (buff) {
-        let stringbuff: string = buff.toString();
-        dataBuff = stringbuff.slice(0, buff.length - 3);
-        client.dataReceived = client.parseIntArray(dataBuff);
-        resolve();
-        clearTimeout(timeout);
+      client.socket.once('data', (buff) => {
+        try {
+          const stringbuff: string = buff.toString();
+          const dataBuff = stringbuff.slice(0, buff.length - 3);
+          client.dataReceived = client.parseIntArray(dataBuff);
+          resolve();
+          clearTimeout(timeout);
+          client.socket.end();
+        } catch (error) {
+          reject(error);
+        }
       });
   
-      client.socket.on('error', (err) => {
-        client.emit('error', { error: 'TCP socket error', msg: err });
-        reject();
+      client.socket.once('error', (err) => {
+        reject(err);
       });
     })
   }
@@ -116,10 +123,23 @@ export default class MewtocolClient extends EventEmitter {
     }
 
     const cmd: string = cmdchar + station + '#RD' + area + startaddr.toString().padStart(5, '0') + endaddr.toString().padStart(5, '0') + '**\r';
-    await this.sendCommand(cmd);
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.sendCommand(cmd);
+        resolve();  
+      } catch (error) {
+        this.error = error as Error | string | IConnectionError;
+        reject(error)
+      }
+    })
   }
 
   public getData(): number[] {
     return this.dataReceived;
+  }
+
+  public getError(): Error | string | IConnectionError | undefined {
+    return this.error;
   }
 }

@@ -4,9 +4,9 @@ import OvenTemperature from '@/model/oven_temperatures.model.js';
 import type { OvenType } from '@/types/index.js';
 
 export default class OvenTemperatureService {
-  constructor() {}
+  constructor(private readonly plc: MewtocolClient) {}
 
-  static async add(plcOven: MewtocolClient, ovenType: OvenType): Promise<void> {
+   public async setTemperature(ovenType: OvenType): Promise<void> {
     const ovenIds = await Oven.findAll({
         attributes: ['id'],
         where: { ovenType }
@@ -14,14 +14,35 @@ export default class OvenTemperatureService {
 
     switch (ovenType) {
         case 'mangan':
-            await plcOven.ReadDataMemory(1, 'D', 200, 219);
+            try {
+                await this.plc.ReadDataMemory(1, 'D', 200, 219);
+            } catch (error) {
+                console.error('Error Service Side: ', error)
+                return;
+            }
+        break;
         case 'bobin':
-            await plcOven.ReadDataMemory(1, 'D', 200, 219);
+            try {
+                await this.plc.ReadDataMemory(1, 'D', 501, 508);
+            } catch (error) {
+                console.error('Error Service Side: ', error)
+                return;
+            }
+        break;
         case 'bubuk':
-            await plcOven.ReadDataMemory(1, 'D', 200, 219);
+            try {
+                await this.plc.ReadDataMemory(1, 'D', 500, 513);
+            } catch (error) {
+                console.error('Error Service Side: ', error);
+                return;
+            }
+        break;
     }
-    const temperatureData: number[] = plcOven.getData();
-    if (ovenIds.length !== temperatureData.length || temperatureData.length === 0) return;
+    const temperatureData: number[] = this.plc.getData();
+    if (ovenIds.length !== temperatureData.length || temperatureData.length === 0) {
+        console.error('data oven overflow');
+        return;
+    };
 
     for (let i = 0; i < temperatureData.length; i++) {
         await OvenTemperature.create({
