@@ -1,17 +1,15 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import ui from '@nuxt/ui/vite';
-import tailwindcss from '@tailwindcss/vite';
+import Components from 'unplugin-vue-components/vite';
+import {PrimeVueResolver} from '@primevue/auto-import-resolver';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), ui({
-    ui: {
-      colors: {
-        primary: 'blue',
-        neutral: 'neutral'
-      }
-    },
-    colorMode: false
-  }), tailwindcss()],
+  plugins: [ vue(), Components({
+    resolvers: [ PrimeVueResolver() ]
+  }) ],
+  server: {
+    host: '0.0.0.0',
+    cors: true
+  },
 });

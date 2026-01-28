@@ -1,5 +1,21 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --animate-pinging: pinging 1s ease-in-out infinite;
+
+  @keyframes pinging {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 1;
+    }
+  }
+}
 
 @font-face {
     font-family: Poppins-Regular;
@@ -18,10 +34,20 @@
 
 @font-face {
     font-family: Panasonic-Light;
-    src: url('fonts/panasonic-font/DINOT-Medium.otf');
+    src: url('fonts/panasonic-font/DINOT-Light.otf');
 }
 
+/* @theme static {
+    --color-green-500: #032e15;
+} */
+
 body {
+    font-family: Panasonic-Medium, sans-serif;
+    /* colorBlue: #fd3d3d; */
+    color: #006154;
+}
+
+.pnsc-semibold {
     font-family: Panasonic-Medium, sans-serif;
 }
 
@@ -31,9 +57,11 @@ body {
 
 .pnsc-light {
     font-family: Panasonic-Light, sans-serif;
+    font-weight: 600;
 }
 
 .test {
-    background-color: #006eff3a;
+    background-color: #88b8f83a;
+    background-color: #032e15;
 
 }
