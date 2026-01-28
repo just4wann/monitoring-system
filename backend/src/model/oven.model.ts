@@ -4,6 +4,7 @@ interface OvenAttributes {
     id: number;
     ovenType: 'mangan' | 'bobin' | 'bubuk';
     ovenNo: number;
+    ovenTargetTemperature: number;
     createdAt: Date;
 }
 
@@ -13,5 +14,6 @@ export default class Oven extends Model<OvenAttributes, OvenCreationAttribute> i
     declare id: number;
     declare ovenType: "mangan" | "bobin" | "bubuk";
     declare ovenNo: number;
+    declare ovenTargetTemperature: number;
     declare createdAt: Date;
 }

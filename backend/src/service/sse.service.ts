@@ -1,4 +1,4 @@
-import MewtocolClient from "@/lib/index.js";
+import MewtocolClient from "@/lib/mewtocol_client/index.js";
 import type { Response } from "express";
 
 export default class SSEService {

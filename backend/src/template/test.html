@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <title>Laporan Suhu Oven</title>
-          <style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Oven Check - 5 Template Sejajar</title>
+  <style>
     @page {
       size: A4 landscape;
+      margin: 10mm;
     }
 
     body {
@@ -28,7 +30,7 @@
 
     .form-container {
       border: 1px solid #000;
-      width: 250px;
+      width: 210px;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -38,35 +40,21 @@
     }
 
     .graph-placeholder {
-    position: relative;
       width: 100%;
-      height: 400px;
+      height: 700px;
       border-bottom: 1px dashed #999;
       display: flex;
       align-items: center;
       justify-content: center;
       font-style: italic;
       color: #555;
-
-      p {
-        position: absolute;
-      }
-
-      p.time {
-        bottom: -5px;
-      }
-
-      p.temp {
-        transform: rotate(-90deg);
-        left: -25px;
-      }
     }
 
     table {
       border-collapse: collapse;
       border: 1px solid #000;
       width: 100%;
-      height: 90%;
+      height: 100%;
     }
 
     td {
@@ -80,22 +68,14 @@
         width: 45%;
     }
 
-    .green {
-      color: green;
-      font-weight: bold;
-      font-style: italic;
-      background-color: rgba(0, 128, 0, 0.212);
-    }
-
-    .red {
-      color: red;
-      font-weight: bold;
-      font-style: italic;
-      background-color: rgba(255, 0, 0, 0.212);
-    }
-
     .value {
         text-align: center;
+    }
+
+    .multi-line {
+      height: 60px;
+      vertical-align: top;
+      padding-top: 5px;
     }
 
     .wide {
@@ -103,27 +83,29 @@
     }
     
   </style>
-    </head>
-    <body>
+</head>
+<body>
   <div class="page">
+    <!-- 5 form sejajar -->
+    <!-- Form Template -->
     <div class="form-container">
       <div class="graph-placeholder">
-        <img src="{{graph_1}}" alt="graph" width="200" height="250">
-        <p class="time">Time</p>
-        <p class="temp">Temperature (°C)</p>
+        <img src="{{graph_1}}" alt="graph" width="200" height="450">
       </div>
       <table>
-        <tr><td class="label">No Oven</td><td class="value">OVEN {{ovenNo_1}} {{type_1}}</td></tr>
+        <tr><td class="label">No Oven</td><td class="value">{{ovenNo_1}}</td></tr>
         <tr><td class="label">Lot Oven</td><td class="value">{{lot_1}}</td></tr>
         <tr><td class="label">Start {{tempTarget_1}} °C</td><td class="value">{{start_1}}</td></tr>
-        <tr><td class="label">Finish {{tempTarget_2}} °C</td><td class="value">{{finish_1}}</td></tr>
+        <tr><td class="label">Finish {{tempTarget_1}} °C</td><td class="value">{{finish_1}}</td></tr>
         <tr>
           <td class="multi-line label">
-            Waktu Oven Suhu {{tempTarget_3}} °C
+            Waktu Oven Suhu {{tempTarget_1}} °C<br>
+            (Spec 6–7 jam 50 menit)<br>
+            Referensi 7 jam 20 menit
           </td>
           <td class="multi-line value">{{time_1}}</td>
         </tr>
-        <tr><td class="label">Judgement</td><td class="value judgement">{{judgement_1}}</td></tr>
+        <tr><td class="label">Judgement</td><td class="value">{{judgement_1}}</td></tr>
         <tr class="wide label"><td>Keterangan</td><td></td></tr>
         <tr><td class="label">Tanggal / Jam Check</td><td class="value">{{date_1}}</td></tr>
         <tr><td class="label">Produksi (MK UP)</td><td class="value">{{productionMember_1}}</td></tr>
@@ -131,24 +113,25 @@
       </table>
     </div>
 
+    <!-- Ulangi 4x -->
     <div class="form-container">
       <div class="graph-placeholder">
-        <img src="{{graph_2}}" alt="graph" width="200" height="250">
-        <p class="time">Time</p>
-        <p class="temp">Temperature (°C)</p>
+        <img src="{{graph_2}}" alt="graph" width="200" height="450">
       </div>
       <table>
-        <tr><td class="label">No Oven</td><td class="value">OVEN {{ovenNo_2}} {{type_2}}</td></tr>
+        <tr><td class="label">No Oven</td><td class="value">{{ovenNo_2}}</td></tr>
         <tr><td class="label">Lot Oven</td><td class="value">{{lot_2}}</td></tr>
-        <tr><td class="label">Start {{tempTarget_4}} °C</td><td class="value">{{start_2}}</td></tr>
-        <tr><td class="label">Finish {{tempTarget_5}} °C</td><td class="value">{{finish_2}}</td></tr>
+        <tr><td class="label">Start {{tempTarget_2}} °C</td><td class="value">{{start_2}}</td></tr>
+        <tr><td class="label">Finish {{tempTarget_2}} °C</td><td class="value">{{finish_2}}</td></tr>
         <tr>
           <td class="multi-line label">
-            Waktu Oven Suhu {{tempTarget_6}} °C
+            Waktu Oven Suhu {{tempTarget_2}} °C<br>
+            (Spec 6–7 jam 50 menit)<br>
+            Referensi 7 jam 20 menit
           </td>
           <td class="multi-line value">{{time_2}}</td>
         </tr>
-        <tr><td class="label">Judgement</td><td class="value judgement">{{judgement_2}}</td></tr>
+        <tr><td class="label">Judgement</td><td class="value">{{judgement_2}}</td></tr>
         <tr class="wide label"><td>Keterangan</td><td></td></tr>
         <tr><td class="label">Tanggal / Jam Check</td><td class="value">{{date_2}}</td></tr>
         <tr><td class="label">Produksi (MK UP)</td><td class="value">{{productionMember_2}}</td></tr>
@@ -158,22 +141,22 @@
 
     <div class="form-container">
       <div class="graph-placeholder">
-        <img src="{{graph_3}}" alt="graph" width="200" height="250">
-        <p class="time">Time</p>
-        <p class="temp">Temperature (°C)</p>
+        <img src="{{graph_3}}" alt="graph" width="200" height="450">
       </div>
       <table>
-        <tr><td class="label">No Oven</td><td class="value">OVEN {{ovenNo_3}} {{type_3}}</td></tr>
+        <tr><td class="label">No Oven</td><td class="value">{{ovenNo_3}}</td></tr>
         <tr><td class="label">Lot Oven</td><td class="value">{{lot_3}}</td></tr>
-        <tr><td class="label">Start {{tempTarget_7}} °C</td><td class="value">{{start_3}}</td></tr>
-        <tr><td class="label">Finish {{tempTarget_8}} °C</td><td class="value">{{finish_3}}</td></tr>
+        <tr><td class="label">Start {{tempTarget_3}} °C</td><td class="value">{{start_3}}</td></tr>
+        <tr><td class="label">Finish {{tempTarget_3}} °C</td><td class="value">{{finish_3}}</td></tr>
         <tr>
           <td class="multi-line label">
-            Waktu Oven Suhu {{tempTarget_9}} °C
+            Waktu Oven Suhu {{tempTarget_3}} °C<br>
+            (Spec 6–7 jam 50 menit)<br>
+            Referensi 7 jam 20 menit
           </td>
           <td class="multi-line value">{{time_3}}</td>
         </tr>
-        <tr><td class="label">Judgement</td><td class="value judgement">{{judgement_3}}</td></tr>
+        <tr><td class="label">Judgement</td><td class="value">{{judgement_3}}</td></tr>
         <tr class="wide label"><td>Keterangan</td><td></td></tr>
         <tr><td class="label">Tanggal / Jam Check</td><td class="value">{{date_3}}</td></tr>
         <tr><td class="label">Produksi (MK UP)</td><td class="value">{{productionMember_3}}</td></tr>
@@ -183,22 +166,22 @@
 
     <div class="form-container">
       <div class="graph-placeholder">
-        <img src="{{graph_4}}" alt="graph" width="200" height="250">
-        <p class="time">Time</p>
-        <p class="temp">Temperature (°C)</p>
+        <img src="{{graph_4}}" alt="graph" width="200" height="450">
       </div>
       <table>
-        <tr><td class="label">No Oven</td><td class="value">OVEN {{ovenNo_4}} {{type_4}}</td></tr>
+        <tr><td class="label">No Oven</td><td class="value">{{ovenNo_4}}</td></tr>
         <tr><td class="label">Lot Oven</td><td class="value">{{lot_4}}</td></tr>
-        <tr><td class="label">Start {{tempTarget_10}} °C</td><td class="value">{{start_4}}</td></tr>
-        <tr><td class="label">Finish {{tempTarget_11}} °C</td><td class="value">{{finish_4}}</td></tr>
+        <tr><td class="label">Start {{tempTarget_4}} °C</td><td class="value">{{start_4}}</td></tr>
+        <tr><td class="label">Finish {{tempTarget_4}} °C</td><td class="value">{{finish_4}}</td></tr>
         <tr>
           <td class="multi-line label">
-            Waktu Oven Suhu {{tempTarget_12}} °C
+            Waktu Oven Suhu {{tempTarget_4}} °C<br>
+            (Spec 6–7 jam 50 menit)<br>
+            Referensi 7 jam 20 menit
           </td>
           <td class="multi-line value">{{time_4}}</td>
         </tr>
-        <tr><td class="label">Judgement</td><td class="value judgement">{{judgement_4}}</td></tr>
+        <tr><td class="label">Judgement</td><td class="value">{{judgement_4}}</td></tr>
         <tr class="wide label"><td>Keterangan</td><td></td></tr>
         <tr><td class="label">Tanggal / Jam Check</td><td class="value">{{date_4}}</td></tr>
         <tr><td class="label">Produksi (MK UP)</td><td class="value">{{productionMember_4}}</td></tr>
@@ -208,22 +191,22 @@
 
     <div class="form-container">
       <div class="graph-placeholder">
-        <img src="{{graph_5}}" alt="graph" width="200" height="250">
-        <p class="time">Time</p>
-        <p class="temp">Temperature (°C)</p>
+        <img src="{{graph_5}}" alt="graph" width="200" height="450">
       </div>
       <table>
-        <tr><td class="label">No Oven</td><td class="value">OVEN {{ovenNo_5}} {{type_5}}</td></tr>
+        <tr><td class="label">No Oven</td><td class="value">{{ovenNo_5}}</td></tr>
         <tr><td class="label">Lot Oven</td><td class="value">{{lot_5}}</td></tr>
-        <tr><td class="label">Start {{tempTarget_13}} °C</td><td class="value">{{start_5}}</td></tr>
-        <tr><td class="label">Finish {{tempTarget_14}} °C</td><td class="value">{{finish_5}}</td></tr>
+        <tr><td class="label">Start {{tempTarget_5}} °C</td><td class="value">{{start_5}}</td></tr>
+        <tr><td class="label">Finish {{tempTarget_5}} °C</td><td class="value">{{finish_5}}</td></tr>
         <tr>
           <td class="multi-line label">
-            Waktu Oven Suhu {{tempTarget_15}} °C
+            Waktu Oven Suhu {{tempTarget_5}} °C<br>
+            (Spec 6–7 jam 50 menit)<br>
+            Referensi 7 jam 20 menit
           </td>
           <td class="multi-line value">{{time_5}}</td>
         </tr>
-        <tr><td class="label">Judgement</td><td class="value judgement">{{judgement_5}}</td></tr>
+        <tr><td class="label">Judgement</td><td class="value">{{judgement_5}}</td></tr>
         <tr class="wide label"><td>Keterangan</td><td></td></tr>
         <tr><td class="label">Tanggal / Jam Check</td><td class="value">{{date_5}}</td></tr>
         <tr><td class="label">Produksi (MK UP)</td><td class="value">{{productionMember_5}}</td></tr>
@@ -233,15 +216,3 @@
   </div>
 </body>
 </html>
-<script>
-    const judgementElement = document.querySelectorAll('.judgement');
-    judgementElement.forEach(element => {
-      if (element.getHTML() == 'OK') {
-          element.classList.add('green');
-          element.classList.remove('red');
-      } else {
-          element.classList.remove('green');
-          element.classList.add('red');
-      } 
-    });
-</script>

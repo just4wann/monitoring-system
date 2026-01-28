@@ -25,13 +25,11 @@ export default class MewtocolClient extends EventEmitter {
     this.socket.setTimeout(this.timeout);
 
     this.socket.on('close', (hadError) => {
-      console.log('connection closed')
       this.emit('disconnect', hadError);
       return;
     });
 
     this.socket.on('timeout', () => {
-      console.log('connection timeout')
       this.emit('timeout', { error: 'Socket idle timeout' });
       this.destroy();
     });
@@ -71,7 +69,6 @@ export default class MewtocolClient extends EventEmitter {
   private async sendCommand(cmd: string): Promise<void> {
     const client = this;
     if (client.socket.destroyed || client.socket.closed) {
-      console.log('reconnetc')
       client.connect();
     }
 
@@ -80,12 +77,13 @@ export default class MewtocolClient extends EventEmitter {
     if (!cmd.endsWith('\r')) cmd += '\r';
 
     return new Promise((resolve, reject) => {
+      client.socket.removeAllListeners();
       client.socket.write(cmd, () => {
         timeout = setTimeout(function () {
           reject('Timeout read data from PLC');
+          client.destroy();
         }, client.timeout);
       });
-  
       client.socket.once('data', (buff) => {
         try {
           const stringbuff: string = buff.toString();
@@ -93,9 +91,10 @@ export default class MewtocolClient extends EventEmitter {
           client.dataReceived = client.parseIntArray(dataBuff);
           resolve();
           clearTimeout(timeout);
-          client.socket.end();
+          client.destroy();
         } catch (error) {
           reject(error);
+          client.destroy();
         }
       });
   
